@@ -1,14 +1,11 @@
 const express = require('express');
 const path = require('path');
 
-// helper function to create a new express app
 function createApp(envName, port) {
   const app = express();
 
-  // static assets
   app.use('/static', express.static(path.join(__dirname, 'public')));
 
-  // main route
   app.get('/', (req, res) => {
     res.send(`
       <!doctype html>
@@ -17,43 +14,24 @@ function createApp(envName, port) {
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <title>Welcome</title>
-        <style>
-          body { font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; display:flex; align-items:center; justify-content:center; height:100vh; margin:0; background:#f7fafc; }
-          .card { background:white; padding:32px 40px; border-radius:12px; box-shadow: 0 6px 20px rgba(16,24,40,0.08); text-align:center; }
-          h1 { margin:0 0 8px 0; font-size:28px; }
-          p { margin:0; color:#334155; }
-          .env { font-weight:700; color:#0f172a; background:#eef2ff; padding:4px 10px; border-radius:6px; display:inline-block; margin-left:8px; }
-        </style>
       </head>
       <body>
-        <div class="card" role="main">
-          <h1>Welcome to <span class="env">${escapeHtml(envName)}</span></h1>
-          <p>Server running on port ${port}</p>
-        </div>
+        <h1>Welcome to ${envName} environment</h1>
+        <p>Server running on port ${port}</p>
       </body>
       </html>
     `);
   });
 
-  // health check
   app.get('/health', (req, res) => res.json({ status: 'ok', env: envName }));
 
-  // start server
   app.listen(port, () => {
-    console.log(`env-welcome app listening on port ${port} (env=${envName})`);
+    console.log(`App running on port ${port} (${envName})`);
   });
 }
 
-// small helper
-function escapeHtml(str) {
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
-
-// start two apps
+// Start dev on 3000
 createApp('dev', 3000);
+
+// Start prod on 3001
 createApp('prod', 3001);
